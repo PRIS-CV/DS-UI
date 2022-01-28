@@ -19,7 +19,7 @@ class MoMLayer(nn.Module):
         if n_component == 1:
             self.pi = torch.ones([1, 1, self.num_out]).cuda()# unormalized weights
         else:
-            self.pi = Parameter(torch.ones([1,            self.n_component, self.num_out]))# unormalized weights
+            self.pi = Parameter(torch.ones([1, self.n_component, self.num_out]))# unormalized weights
 
         self.omega = torch.zeros([1, self.num_out]).cuda()
         self.num_data = 0
@@ -34,7 +34,6 @@ class MoMLayer(nn.Module):
         #     init.uniform_(self.bias, -bound, bound)
 
     def log_gaussian_prob(self, x, mu, log_sigma):
-        # return (torch.sum(log_sigma, dim=1) + torch.sum((x - mu).pow(2) / torch.exp(log_sigma), dim=1) + self.c).squeeze() / (-2)
         return (torch.sum(log_sigma, dim=1) + torch.sum((x - mu).pow(2) / torch.exp(log_sigma), dim=1)) / (-2.)
 
     def kl_mvn(self, log_sigma1, sigma2):
@@ -76,10 +75,8 @@ class MoMLayer(nn.Module):
 
     def forward(self, x):
         b = x.size(0)
-        y = (self.activation(x).matmul(self.mu.view(self.num, -1)).view(b, self.n_component, self.num_out) \
-            * self.pi.repeat(b, 1, 1)).sum(dim=1)
+        y = (self.activation(x).matmul(self.mu.view(self.num, -1)).view(b, self.n_component, self.num_out) * self.pi.repeat(b, 1, 1)).sum(dim=1)
         z = x.view(b, -1, 1, 1).repeat(1, 1, self.n_component, self.num_out)
-        z = F.softmax(self.pi, dim=1).repeat(b, 1, 1) \
-            * self.log_gaussian_prob(z, self.mu.unsqueeze(0).expand_as(z), self.sigma.expand_as(z)).exp()
+        z = F.softmax(self.pi, dim=1).repeat(b, 1, 1) * self.log_gaussian_prob(z, self.mu.unsqueeze(0).expand_as(z), self.sigma.expand_as(z)).exp()
         z = self.omega.add_(1e-8).log().repeat(b, 1) + z.sum(dim=1).add_(1e-8).log()
         return y, z
