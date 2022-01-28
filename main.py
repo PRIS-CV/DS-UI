@@ -236,22 +236,16 @@ def gmm_uncertainty():
     targets = np.array(targets_list)
     print('1. fc output')
     aucs = gmm_auc(probs1, alphas1, targets)
-    # aucs = (auroc_max_prob, auroc_ent, auroc_mi, auroc_diff_ent, aupr_max_prob, aupr_ent, aupr_mi, aupr_diff_ent)
-    print('AUROC of Max.P/Ent./M.I./D.Ent.: %.4f %.4f %.4f %.4f' % aucs[:4])
-    print('AUPR  of Max.P/Ent./M.I./D.Ent.: %.4f %.4f %.4f %.4f' % aucs[4:])
+    # aucs = (auroc_max_prob, auroc_ent, aupr_max_prob, aupr_ent)
+    print('AUROC of Max.P/Ent.: %.4f %.4f' % aucs[:2])
+    print('AUPR  of Max.P/Ent.: %.4f %.4f' % aucs[2:])
     print('###################\n\n')
 
     print('2. gmm output')
     aucs = gmm_auc(probs2, alphas2, targets)
-    print('AUROC of Max.P/Ent./M.I./D.Ent.: %.4f %.4f %.4f %.4f' % aucs[:4])
-    print('AUPR  of Max.P/Ent./M.I./D.Ent.: %.4f %.4f %.4f %.4f' % aucs[4:])
+    print('AUROC of Max.P/Ent.: %.4f %.4f' % aucs[:2])
+    print('AUPR  of Max.P/Ent.: %.4f %.4f' % aucs[2:])
     print('###################\n\n')
-
-def cosine_anneal_schedule(t):
-    cos_inner = np.pi * (t % (nb_epoch))  # t - 1 is used when t has 1-based indexing.
-    cos_inner /= (nb_epoch)
-    cos_out = np.cos(cos_inner) + 1
-    return float( 0.1 / 2 * cos_out)
 
 def cycle_learning_rate(init_lr, cycle_len, n_epoch):
     lr = []
@@ -280,5 +274,5 @@ else:
         val_acc = acc[0]
         torch.save(net, save_path + '/checkpoint.pth')
 
-print('GMM uncertainty')
+print('Uncertainty')
 gmm_uncertainty()
