@@ -1,4 +1,3 @@
-'''Train CIFAR10 with PyTorch.'''
 from __future__ import print_function
 import time
 import numpy as np
@@ -63,13 +62,13 @@ transform_test = transforms.Compose([
     transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5)),
 ])
 
-trainset = torchvision.datasets.CIFAR10(root='/data/xiejiyang/data', train=True, download=True, transform=transform_train)
+trainset = torchvision.datasets.CIFAR10(root='data', train=True, download=True, transform=transform_train)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=256, shuffle=True, num_workers=2)
 
-testset = torchvision.datasets.CIFAR10(root='/data/xiejiyang/data', train=False, download=True, transform=transform_test)
+testset = torchvision.datasets.CIFAR10(root='data', train=False, download=True, transform=transform_test)
 testloader = torch.utils.data.DataLoader(testset, batch_size=256, shuffle=False, num_workers=2)
 
-uiset = torchvision.datasets.CIFAR10(root='/data/xiejiyang/data', train=False, download=True, transform=transform_test)
+uiset = torchvision.datasets.CIFAR10(root='data', train=False, download=True, transform=transform_test)
 uiloader = torch.utils.data.DataLoader(uiset, batch_size=256, shuffle=False, num_workers=2)
 
 # Model
@@ -190,8 +189,7 @@ def test(epoch):
     test_acc2 = 100. * correct2 / total
     test_loss = test_loss / (idx + 1)
     logging.info('test, test_acc_cls = %.4f, test_acc_gmm = %.4f, test_loss = %.4f' % (test_acc1, test_acc2, test_loss))
-    results_test_file.write('%d,%.4f,%.4f,%.4f\n'  \
-                            % (epoch, test_acc1, test_acc2, test_loss))
+    results_test_file.write('%d,%.4f,%.4f,%.4f\n' % (epoch, test_acc1, test_acc2, test_loss))
     results_test_file.flush()
     return test_acc1, test_acc2, test_loss
 
@@ -281,12 +279,6 @@ else:
         acc = test(epoch)
         val_acc = acc[0]
         torch.save(net, save_path + '/checkpoint.pth')
-        if val_acc > max_val_acc:
-            max_val_acc = val_acc
-            torch.save(net, save_path + '/model_best.pth')
 
-        print("the max_val_acc === ", max_val_acc)
-
-print('\nCheckpoint:')
 print('GMM uncertainty')
 gmm_uncertainty()
